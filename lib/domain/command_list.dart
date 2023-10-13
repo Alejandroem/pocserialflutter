@@ -4,6 +4,8 @@ abstract class CommandList {
   List<int> get lineFeed;
   List<int> get print;
   List<int> get printAndFeedOneLine;
+
+  List<int> get drawerStatus;
   List<int> printAndFeedLines(int lines);
   List<int> get printAndCarriageReturn;
   List<int> get readPrinterStatus;

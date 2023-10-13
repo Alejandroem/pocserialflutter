@@ -10,13 +10,13 @@ class SerialConnection extends Connection {
   bool isConnected = false;
 
   @override
-  Future<bool> connect(String comPort) async {
+  Future<bool> connect(String address) async {
     try {
-      this.comPort = comPort;
-      port = SerialPort(comPort);
+      comPort = address;
+      port = SerialPort(address);
 
       if (port!.openReadWrite()) {
-        log('Connected to $comPort');
+        log('Connected to $address');
         isConnected = true;
         return true;
       }
@@ -71,5 +71,17 @@ class SerialConnection extends Connection {
       disconnect();
     }
     return false;
+  }
+
+  @override
+  Future<List<int>> read() async {
+    try {
+      final List<int> bytes = port!.read(1024, timeout: 500);
+      return bytes;
+    } catch (e) {
+      log(e.toString());
+      disconnect();
+    }
+    return [];
   }
 }

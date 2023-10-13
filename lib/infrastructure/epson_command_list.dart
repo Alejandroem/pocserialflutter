@@ -39,4 +39,7 @@ class EpsonCommandList extends CommandList {
 
   @override
   List<int> get kickDrawer => [0x1B, 0x70, 0x00, 0x50, 0x50];
+
+  @override
+  List<int> get drawerStatus => [0x10, 0x04, 0x01];
 }

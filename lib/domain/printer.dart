@@ -87,4 +87,19 @@ abstract class Printer {
     }
     return false;
   }
+
+  Future<bool> isDrawerOpen() async {
+    try {
+      final List<int> command = commands.drawerStatus;
+      connection.write(command);
+      final List<int> response = await connection.read();
+      if (response.first == 22) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print(e.toString());
+    }
+    return false;
+  }
 }

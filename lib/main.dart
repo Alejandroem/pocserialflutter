@@ -1,20 +1,25 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'domain/printer.dart';
 import 'infrastructure/epson_network_printer.dart';
 import 'infrastructure/epson_serial_printer.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  String ipAddress = '192.168.100.1';
+  //String ipAddress = '192.168.100.1';
+  String ipAddress = "192.168.100.74";
   String comPort = 'COM3';
-  List<String> log = [];
+  List<String> logs = [];
 
   Printer? serialPrinter;
   Printer? networkPrinter;
@@ -36,14 +41,14 @@ class _MyAppState extends State<MyApp> {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('ESC/POS Printing Demo'),
+          title: const Text('ESC/POS Printing Demo'),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter IP Address',
                 ),
                 onChanged: (value) {
@@ -52,9 +57,9 @@ class _MyAppState extends State<MyApp> {
                   });
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter COM Port',
                 ),
                 onChanged: (value) {
@@ -66,35 +71,53 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () {
                   networkPrinter!.connection.connect(ipAddress);
-                  networkPrinter!.println('Hello World!');
+                  networkPrinter!.println(
+                      'Hellosssssssssssssssssssssssssssssssssssssssssssssssswwwwwwwwwwwwwwwsssssssss World!');
                   networkPrinter!.feed(2);
                   networkPrinter!.cut();
                   networkPrinter!.kickDrawer(2);
-                  networkPrinter!.printBarcode(123456789);
                   networkPrinter!.connection.disconnect();
                 },
-                child: Text('Print via IP'),
+                child: const Text('Print via IP'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  serialPrinter!.connection.connect(comPort);
+                  bool open = await serialPrinter!.isDrawerOpen();
+                  log(open.toString());
+                  do {
+                    await Future.delayed(const Duration(seconds: 1));
+                    log("Drawer is open close it");
+                  } while (await serialPrinter!.isDrawerOpen());
+                  log("Drawer is closed");
+
+                  serialPrinter!.connection.disconnect();
+                },
+                child: const Text('Drawer Status'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
                   serialPrinter!.connection.connect(comPort);
                   serialPrinter!.println(
                       'Hello Worldsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss!1');
-                  //serialPrinter!.kickDrawer(2);
+                  serialPrinter!.kickDrawer(2);
                   serialPrinter!.feed(10);
                   serialPrinter!.cut();
                   serialPrinter!.printBarcode(123123123123123);
+                  bool status = await networkPrinter!.isDrawerOpen();
+                  log(status.toString());
                   serialPrinter!.connection.disconnect();
                 },
-                child: Text('Print via COM'),
+                child: const Text('Print via COM'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Expanded(
                 child: ListView.builder(
-                  itemCount: log.length,
+                  itemCount: logs.length,
                   itemBuilder: (context, index) {
-                    return Text(log[index]);
+                    return Text(logs[index]);
                   },
                 ),
               ),
