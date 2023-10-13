@@ -102,4 +102,28 @@ abstract class Printer {
     }
     return false;
   }
+
+  Future<String> getRawStatusPin1() async {
+    try {
+      //pin 1
+      connection.write([0x10, 0x04, 0x01]);
+      final List<int> response = await connection.read();
+      return response.toString();
+    } catch (e) {
+      print(e.toString());
+    }
+    return '';
+  }
+
+  Future<String> getRawStatusPin2() async {
+    try {
+      //pin 2
+      connection.write([0x10, 0x04, 0x02]);
+      final List<int> response = await connection.read();
+      return response.toString();
+    } catch (e) {
+      print(e.toString());
+    }
+    return '';
+  }
 }

@@ -82,8 +82,9 @@ class NetworkConnection extends Connection {
   @override
   Future<bool> write(List<int> bytes) async {
     try {
-      socket!.add(bytes);
       await socket!.flush();
+      socket!.add(bytes);
+      await socket!.drain();
       return true;
     } catch (e) {
       log("Error while sending print command: $e");

@@ -81,150 +81,186 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Stack(
             children: [
-              Column(
-                children: <Widget>[
-                  TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Enter IP Address',
+              SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    TextField(
+                      decoration: const InputDecoration(
+                        hintText: 'Enter IP Address',
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          ipAddress = value;
+                        });
+                      },
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        ipAddress = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Enter COM Port',
+                    const SizedBox(height: 16),
+                    TextField(
+                      decoration: const InputDecoration(
+                        hintText: 'Enter COM Port',
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          comPort = value;
+                        });
+                      },
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        comPort = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        printText = value;
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Text to print',
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          printText = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Text to print',
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        feedLines = int.tryParse(value) ?? 1;
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Number of lines to feed',
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          feedLines = int.tryParse(value) ?? 1;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Number of lines to feed',
+                      ),
+                      keyboardType: TextInputType.number,
                     ),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 16),
-                  SwitchListTile(
-                    title: const Text('Connection Type'),
-                    value: isNetworkConnection,
-                    onChanged: (bool value) {
-                      setState(() {
-                        isNetworkConnection = value;
-                      });
-                    },
-                    secondary: const Icon(Icons.swap_horiz),
-                    subtitle: Text('Currently using: $activeConnectionType'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await executePrinterCommand(() async {
+                    const SizedBox(height: 16),
+                    SwitchListTile(
+                      title: const Text('Connection Type'),
+                      value: isNetworkConnection,
+                      onChanged: (bool value) {
+                        setState(() {
+                          isNetworkConnection = value;
+                        });
+                      },
+                      secondary: const Icon(Icons.swap_horiz),
+                      subtitle: Text('Currently using: $activeConnectionType'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await executePrinterCommand(() async {
+                          if (isNetworkConnection) {
+                            await networkPrinter!.print(printText);
+                          } else {
+                            await serialPrinter!.print(printText);
+                          }
+                        });
+                        logAction('Printed text via $activeConnectionType');
+                      },
+                      child: Text('Print Text via $activeConnectionType'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await executePrinterCommand(() async {
+                          if (isNetworkConnection) {
+                            await networkPrinter!.feed(feedLines);
+                          } else {
+                            await serialPrinter!.feed(feedLines);
+                          }
+                        });
+                        logAction('Fed lines via $activeConnectionType');
+                      },
+                      child: Text('Feed Lines via $activeConnectionType'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await executePrinterCommand(() async {
+                          if (isNetworkConnection) {
+                            await networkPrinter!.cut();
+                          } else {
+                            await serialPrinter!.cut();
+                          }
+                        });
+                        logAction('Cut paper via $activeConnectionType');
+                      },
+                      child: Text('Cut Paper via $activeConnectionType'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await executePrinterCommand(() async {
+                          if (isNetworkConnection) {
+                            await networkPrinter!.kickDrawer(2);
+                          } else {
+                            await serialPrinter!.kickDrawer(2);
+                          }
+                        });
+                      },
+                      child: const Text('Kick Drawer'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await executePrinterCommand(() async {
+                          if (isNetworkConnection) {
+                            String status =
+                                await networkPrinter!.getRawStatusPin1();
+                            logAction('Drawer status Pin 1 : $status');
+                          } else {
+                            String status =
+                                await serialPrinter!.getRawStatusPin1();
+                            logAction('Drawer status Pin 1: $status');
+                          }
+                        });
+                      },
+                      child: const Text('Get raw status Pin 1'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await executePrinterCommand(() async {
+                          if (isNetworkConnection) {
+                            String status =
+                                await networkPrinter!.getRawStatusPin2();
+                            logAction('Drawer status Pin 2 : $status');
+                          } else {
+                            String status =
+                                await serialPrinter!.getRawStatusPin2();
+                            logAction('Drawer status Pin 2: $status');
+                          }
+                        });
+                      },
+                      child: const Text('Get raw status Pin 2'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await executePrinterCommand(() async {
+                          if (isNetworkConnection) {
+                            bool open = await networkPrinter!.isDrawerOpen();
+                            logAction(
+                                'Drawer status: ' + (open ? 'Open' : 'Closed'));
+                          } else {
+                            bool open = await serialPrinter!.isDrawerOpen();
+                            logAction(
+                                'Drawer status: ' + (open ? 'Open' : 'Closed'));
+                          }
+                        });
+                      },
+                      child: const Text('Check Drawer Status'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
                         if (isNetworkConnection) {
-                          await networkPrinter!.print(printText);
+                          await openDrawerAndWait(networkPrinter);
                         } else {
-                          await serialPrinter!.print(printText);
+                          await openDrawerAndWait(serialPrinter);
                         }
-                      });
-                      logAction('Printed text via $activeConnectionType');
-                    },
-                    child: Text('Print Text via $activeConnectionType'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await executePrinterCommand(() async {
-                        if (isNetworkConnection) {
-                          await networkPrinter!.feed(feedLines);
-                        } else {
-                          await serialPrinter!.feed(feedLines);
-                        }
-                      });
-                      logAction('Fed lines via $activeConnectionType');
-                    },
-                    child: Text('Feed Lines via $activeConnectionType'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await executePrinterCommand(() async {
-                        if (isNetworkConnection) {
-                          await networkPrinter!.cut();
-                        } else {
-                          await serialPrinter!.cut();
-                        }
-                      });
-                      logAction('Cut paper via $activeConnectionType');
-                    },
-                    child: Text('Cut Paper via $activeConnectionType'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await executePrinterCommand(() async {
-                        if (isNetworkConnection) {
-                          await networkPrinter!.kickDrawer(2);
-                        } else {
-                          await serialPrinter!.kickDrawer(2);
-                        }
-                      });
-                    },
-                    child: const Text('Kick Drawer'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await executePrinterCommand(() async {
-                        if (isNetworkConnection) {
-                          bool open = await networkPrinter!.isDrawerOpen();
-                          logAction(
-                              'Drawer status: ' + (open ? 'Open' : 'Closed'));
-                        } else {
-                          bool open = await serialPrinter!.isDrawerOpen();
-                          logAction(
-                              'Drawer status: ' + (open ? 'Open' : 'Closed'));
-                        }
-                      });
-                    },
-                    child: const Text('Check Drawer Status'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (isNetworkConnection) {
-                        await openDrawerAndWait(networkPrinter);
-                      } else {
-                        await openDrawerAndWait(serialPrinter);
-                      }
-                    },
-                    child:
-                        Text('Open Drawer and Wait via $activeConnectionType'),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                      },
+                      child: Text(
+                          'Open Drawer and Wait via $activeConnectionType'),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
               Positioned(
                 top: 0,
